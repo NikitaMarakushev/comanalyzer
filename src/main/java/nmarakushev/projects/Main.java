@@ -22,7 +22,10 @@ public class Main {
             String[] sentences = sentenceDetector.sentDetect(" First sentence. Second sentence. ");
             for (String var : sentences) {
                 System.out.println(var);
+                String n = "nnn";
             }
+            sentenceDetector.notify();
+
         } catch (Exception e) {
             System.out.println("Модель не открылась \n");
             System.out.println(e.getMessage());

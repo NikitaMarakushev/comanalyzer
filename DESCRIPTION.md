@@ -23,6 +23,9 @@ cammentanalyzer должен запускаться для проекта и п�
 
 https://www.baeldung.com/apache-open-nlp
 https://opennlp.apache.org/docs/2.5.0/manual/opennlp.html
+https://habr.com/ru/companies/otus/articles/755772/
+https://habr.com/ru/companies/ods/articles/843250/
+https://www.tutorialspoint.com/opennlp/opennlp_quick_guide.htm
 
 детализированный план (примерный):
 1) подготовить данные о комментариях
@@ -30,3 +33,5 @@ https://opennlp.apache.org/docs/2.5.0/manual/opennlp.html
 3) определение частей речь
 4) извлечение именованных сущностей
 5) анализ результатов
+
+Попробовать сделать модель для русского языка
