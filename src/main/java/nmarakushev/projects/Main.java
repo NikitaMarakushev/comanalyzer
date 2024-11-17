@@ -1,11 +1,21 @@
 package nmarakushev.projects;
 
+import opennlp.tools.doccat.DoccatFactory;
+import opennlp.tools.namefind.BioCodec;
+import opennlp.tools.namefind.TokenNameFinderFactory;
 import opennlp.tools.sentdetect.SentenceDetectorME;
 import opennlp.tools.sentdetect.SentenceModel;
+import opennlp.tools.util.MarkableFileInputStreamFactory;
+import opennlp.tools.util.ObjectStream;
+import opennlp.tools.util.PlainTextByLineStream;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Objects;
 
 public class Main {
     public static void main(String[] args) {
@@ -24,7 +34,13 @@ public class Main {
                 System.out.println(var);
                 String n = "nnn";
             }
-            sentenceDetector.notify();
+
+            // https://opennlp.apache.org/docs/2.5.0/manual/opennlp.html#tools.namefind.training
+            TokenNameFinderFactory factory = TokenNameFinderFactory.create(null, null, Collections.emptyMap(), new BioCodec());
+            File trainingFile = new File(pathToSentenceModel);
+            ObjectStream<String> lineStream =
+                    new PlainTextByLineStream(new MarkableFileInputStreamFactory(trainingFile), StandardCharsets.UTF_8);
+
 
         } catch (Exception e) {
             System.out.println("Модель не открылась \n");
