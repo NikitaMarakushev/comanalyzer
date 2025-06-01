@@ -1,50 +1,31 @@
 package nmarakushev.projects;
 
-import opennlp.tools.doccat.DoccatFactory;
-import opennlp.tools.namefind.BioCodec;
-import opennlp.tools.namefind.TokenNameFinderFactory;
-import opennlp.tools.sentdetect.SentenceDetectorME;
-import opennlp.tools.sentdetect.SentenceModel;
-import opennlp.tools.util.MarkableFileInputStreamFactory;
-import opennlp.tools.util.ObjectStream;
-import opennlp.tools.util.PlainTextByLineStream;
-
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Objects;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.List;
 
 public class Main {
-    public static void main(String[] args) {
-        String pathToSentenceModel = "models\\opennlp-ru-ud-gsd-sentence-1.1-2.4.0.bin";
-        String pathToTokensModel = "models\\opennlp-ru-ud-gsd-tokens-1.1-2.4.0.bin";
-        System.out.println(System.getProperty("user.dir") + "\n");
+    public static void main(String[] args) throws IOException {
+        File javaFile = new File("Example.java");
+        String fileContent = Files.readString(javaFile.toPath());
 
-        File modelFile = new File(pathToSentenceModel);
-        System.out.println(modelFile.lastModified());
+        CommentExtractor extractor = new CommentExtractor();
+        List<Comment> comments = extractor.extractComments(javaFile);
 
-        try (InputStream modelIn = new FileInputStream(modelFile)) {
-            SentenceModel model = new SentenceModel(modelIn);
-            SentenceDetectorME sentenceDetector = new SentenceDetectorME(model);
-            String[] sentences = sentenceDetector.sentDetect(" First sentence. Second sentence. ");
-            for (String var : sentences) {
-                System.out.println(var);
-                String n = "nnn";
-            }
+        CodeAnalyzer codeAnalyzer = new CodeAnalyzer();
+        NLPProcessor nlpProcessor = new NLPProcessor();
+        RelevanceAnalyzer relevanceAnalyzer = new RelevanceAnalyzer(nlpProcessor);
 
-            // https://opennlp.apache.org/docs/2.5.0/manual/opennlp.html#tools.namefind.training
-            TokenNameFinderFactory factory = TokenNameFinderFactory.create(null, null, Collections.emptyMap(), new BioCodec());
-            File trainingFile = new File(pathToSentenceModel);
-            ObjectStream<String> lineStream =
-                    new PlainTextByLineStream(new MarkableFileInputStreamFactory(trainingFile), StandardCharsets.UTF_8);
+        for (Comment comment : comments) {
+            CodeContext context = codeAnalyzer.getCodeContext(fileContent, comment);
+            double usefulness = relevanceAnalyzer.calculateUsefulness(comment, context);
+            boolean isRedundant = relevanceAnalyzer.isRedundant(comment, context);
 
-
-        } catch (Exception e) {
-            System.out.println("Модель не открылась \n");
-            System.out.println(e.getMessage());
+            System.out.println("Line " + comment.lineNumber() + ";");
+            System.out.println("Comment: " + comment.text());
+            System.out.println("Usefulness score: " + usefulness);
+            System.out.println("Is redundant: " + isRedundant);
         }
     }
 }
