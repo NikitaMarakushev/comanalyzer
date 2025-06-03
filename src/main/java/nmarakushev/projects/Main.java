@@ -1,5 +1,12 @@
 package nmarakushev.projects;
 
+import nmarakushev.projects.analyzer.CodeAnalyzer;
+import nmarakushev.projects.analyzer.RelevanceAnalyzer;
+import nmarakushev.projects.context.CodeContext;
+import nmarakushev.projects.entity.Comment;
+import nmarakushev.projects.extractor.CommentExtractor;
+import nmarakushev.projects.processor.NLPProcessor;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;

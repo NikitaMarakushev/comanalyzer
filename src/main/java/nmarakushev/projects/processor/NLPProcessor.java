@@ -1,4 +1,4 @@
-package nmarakushev.projects;
+package nmarakushev.projects.processor;
 
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
@@ -10,10 +10,13 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class NLPProcessor {
+    private static final String MODEL_PATH = "/models/en-token.bin";
+
     private final Tokenizer tokenizer;
 
     public NLPProcessor() throws IOException {
-        InputStream modelIn = getClass().getResourceAsStream("/models/en-token.bin");
+        InputStream modelIn = getClass().getResourceAsStream(MODEL_PATH);
+        assert modelIn != null;
         TokenizerModel model = new TokenizerModel(modelIn);
         this.tokenizer = new TokenizerME(model);
     }

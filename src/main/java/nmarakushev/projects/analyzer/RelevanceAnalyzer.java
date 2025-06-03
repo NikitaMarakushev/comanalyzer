@@ -1,4 +1,8 @@
-package nmarakushev.projects;
+package nmarakushev.projects.analyzer;
+
+import nmarakushev.projects.entity.Comment;
+import nmarakushev.projects.processor.NLPProcessor;
+import nmarakushev.projects.context.CodeContext;
 
 import java.util.Set;
 

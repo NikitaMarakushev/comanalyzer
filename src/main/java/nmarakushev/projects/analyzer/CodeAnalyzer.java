@@ -1,4 +1,7 @@
-package nmarakushev.projects;
+package nmarakushev.projects.analyzer;
+
+import nmarakushev.projects.context.CodeContext;
+import nmarakushev.projects.entity.Comment;
 
 import java.util.HashSet;
 import java.util.Set;

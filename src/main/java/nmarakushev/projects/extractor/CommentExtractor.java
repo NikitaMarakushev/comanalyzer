@@ -1,4 +1,6 @@
-package nmarakushev.projects;
+package nmarakushev.projects.extractor;
+
+import nmarakushev.projects.entity.Comment;
 
 import java.io.File;
 import java.io.IOException;
