@@ -1,19 +1,14 @@
-package nmarakushev.projects;
+package nmarakushev.projects.processor;
 
-import nmarakushev.projects.processor.NLPProcessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import opennlp.tools.tokenize.Tokenizer;
 
 import java.io.IOException;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class NLPProcessorTest {
 
