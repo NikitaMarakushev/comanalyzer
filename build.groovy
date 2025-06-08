@@ -1,76 +1,66 @@
-@Grab('org.eclipse.jgit:org.eclipse.jgit:5.13.0.202109080827-r')
-@Grab('org.apache.maven:maven-model:3.8.4')
-import org.eclipse.jgit.api.Git
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader
-import groovy.xml.XmlSlurper
+#!/usr/bin/env groovy
 
-def repoUrl = 'https://github.com/NikitaMarakushev/comanalyzer.git'
-def tempDir = File.createTempDir('comanalyzer-build-', '')
 def outputJar = new File('comanalyzer.jar')
 
-try {
-    println "Cloning git repo..."
-    Git.cloneRepository()
-            .setURI(repoUrl)
-            .setDirectory(tempDir)
-            .call()
+println "Run build project comanalyzer..."
 
-    println "Analyze project..."
-    def pomFile = new File(tempDir, 'pom.xml')
+try {
+    def pomFile = new File('pom.xml')
     if (!pomFile.exists()) {
-        throw new RuntimeException("There is no pom.xml filein repo")
+        throw new RuntimeException("Error: pom.xml not found")
     }
 
-    def pom = new MavenXpp3Reader().read(new FileReader(pomFile))
-    def mainClass = findMainClass(pomFile)
+    def mainClass = getMainClassFromPom(pomFile)
+    if (!mainClass) {
+        throw new RuntimeException("There is no main class from pom.xml")
+    }
+
+    println "Main class found: $mainClass"
 
     println "Run maven build..."
-    def mvnCmd = "mvn clean package -DskipTests -f ${pomFile.absolutePath}"
-    def proc = mvnCmd.execute(null, tempDir)
-    proc.waitForProcessOutput(System.out, System.err)
+    def mvnCmd = "mvn clean compile assembly:single -DskipTests"
+    def mvnProc = mvnCmd.execute()
+    mvnProc.waitForProcessOutput(System.out, System.err)
 
-    if (proc.exitValue() != 0) {
-        throw new RuntimeException("Maven build failed with error")
+    if (mvnProc.exitValue() != 0) {
+        throw new RuntimeException("Maven build error")
     }
 
-    def targetDir = new File(tempDir, 'target')
-    def builtJar = targetDir.listFiles().find { it.name.endsWith('.jar') && !it.name.endsWith('-sources.jar') }
+    def targetDir = new File('target')
+    def builtJar = targetDir.listFiles().find {
+        it.name.endsWith('-jar-with-dependencies.jar') ||
+                (it.name.startsWith('comanalyzer') && it.name.endsWith('.jar') && !it.name.endsWith('-sources.jar'))
+    }
 
     if (!builtJar) {
-        throw new RuntimeException("There is no built JAR")
+        throw new RuntimeException("There is no built JAR-file found")
     }
 
-    println "Copy results..."
+    if (outputJar.exists()) {
+        outputJar.delete()
+    }
     builtJar.renameTo(outputJar)
 
-    println "Done! Executable JAR : ${outputJar.absolutePath}"
-    if (mainClass) {
-        println "The main class is : $mainClass"
-        println "Run: java -jar ${outputJar.name}"
-    }
-} finally {
-    tempDir.deleteDir()
+    println "\nBuild success!"
+    println "Executable JAR: ${outputJar.absolutePath}"
+    println "Run using: java -jar ${outputJar.name}"
+
+} catch (Exception e) {
+    println "\nBuild error: ${e.message}"
+    System.exit(1)
 }
 
-def findMainClass(File pomFile) {
+static def getMainClassFromPom(File pomFile) {
     def pom = new XmlSlurper().parse(pomFile)
 
-    def shadePlugin = pom.build.plugins.plugin.find {
-        it.artifactId.text() == 'maven-shade-plugin'
-    }
+    def mainClass = pom.properties?.getProperty('exec.mainClass')?.text()
+    if (mainClass) return mainClass
 
-    if (shadePlugin) {
-        return shadePlugin.configuration?.archive?.manifest?.mainClass?.text()
+    def jarPlugin = pom.build?.plugins?.plugin?.find {
+        it.artifactId.text() == 'maven-jar-plugin'
     }
+    mainClass = jarPlugin?.configuration?.archive?.manifest?.mainClass?.text()
+    if (mainClass) return mainClass
 
-    def springBootPlugin = pom.build.plugins.plugin.find {
-        it.artifactId.text() == 'spring-boot-maven-plugin'
-    }
-
-    if (springBootPlugin) {
-        return springBootPlugin.configuration?.mainClass?.text() ?:
-                pom.parent.artifactId.text() + '.Application'
-    }
-
-    return null
+    return "${pom.groupId.text()}.${pom.artifactId.text()}.Main"
 }
