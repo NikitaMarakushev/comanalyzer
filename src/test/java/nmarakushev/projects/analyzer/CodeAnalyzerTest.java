@@ -18,7 +18,6 @@ public class CodeAnalyzerTest {
     
     @Test
     public void testGetCodeContext() {
-        // Arrange
         String fileContent = "public class Test {\n" +
                            "    private String name;\n" +
                            "    // test comment\n" +
@@ -27,11 +26,9 @@ public class CodeAnalyzerTest {
                            "    }\n" +
                            "}";
         Comment comment = new Comment("test comment", Comment.CommentType.SINGLE_LINE, 3);
-        
-        // Act
+
         CodeContext context = codeAnalyzer.getCodeContext(fileContent, comment);
-        
-        // Assert
+
         assertNotNull(context);
         assertTrue(context.nearbyCode().contains("private String name"));
         assertTrue(context.nearbyCode().contains("public void doSomething()"));

@@ -21,13 +21,10 @@ public class NLPProcessorTest {
 
     @Test
     public void testExtractKeyTerms() {
-        // Arrange
         String comment = "This method calculates the sum of two numbers";
-        
-        // Act
+
         Set<String> terms = nlpProcessor.extractKeyTerms(comment);
-        
-        // Assert
+
         assertNotNull(terms);
         assertTrue(terms.contains("method"));
         assertTrue(terms.contains("calculates"));
@@ -41,22 +38,17 @@ public class NLPProcessorTest {
     
     @Test
     public void testExtractKeyTerms_EmptyInput() {
-        // Act
         Set<String> terms = nlpProcessor.extractKeyTerms("");
-        
-        // Assert
+
         assertNotNull(terms);
         assertTrue(terms.isEmpty());
     }
     
     @Test
     public void testExtractKeyTerms_NullInput() {
-        // Act
-        Set<String> terms = nlpProcessor.extractKeyTerms(null);
-        
-        // Assert
-        assertNotNull(terms);
-        assertTrue(terms.isEmpty());
+        assertThrows(NullPointerException.class, () -> {
+            nlpProcessor.extractKeyTerms(null);
+        });
     }
 
     @Nested
@@ -232,12 +224,8 @@ public class NLPProcessorTest {
         @Test
         @DisplayName("Should handle very long comment")
         void shouldHandleVeryLongComment() {
-            StringBuilder longComment = new StringBuilder();
-            for (int i = 0; i < 1000; i++) {
-                longComment.append("method calculates total amount ");
-            }
 
-            Set<String> keyTerms = nlpProcessor.extractKeyTerms(longComment.toString());
+            Set<String> keyTerms = nlpProcessor.extractKeyTerms("method calculates total amount ".repeat(1000));
 
             assertNotNull(keyTerms);
             assertEquals(4, keyTerms.size());

@@ -16,19 +16,30 @@ public class CommentExtractor {
         boolean inMultiLineComment = false;
         StringBuilder multiLineComment = new StringBuilder();
         int multiLineStart = -1;
+        int nestedLevel = 0;
 
         for (int i = 0; i < lines.size(); i++) {
             String line = lines.get(i).trim();
 
             if (inMultiLineComment) {
+                if (line.contains("/*")) {
+                    nestedLevel++;
+                }
                 if (line.contains("*/")) {
-                    multiLineComment.append(line.substring(0, line.indexOf("*/")));
-                    comments.add(new Comment(
-                            multiLineComment.toString(),
-                            Comment.CommentType.MULTI_LINE,
-                            multiLineStart
-                    ));
-                    inMultiLineComment = false;
+                    if (nestedLevel > 0) {
+                        nestedLevel--;
+                    } else {
+                        multiLineComment.append(line.substring(0, line.indexOf("*/")));
+                        String commentText = multiLineComment.toString().trim();
+                        if (!commentText.isEmpty()) {
+                            comments.add(new Comment(
+                                    commentText,
+                                    Comment.CommentType.MULTI_LINE,
+                                    multiLineStart
+                            ));
+                        }
+                        inMultiLineComment = false;
+                    }
                 } else {
                     multiLineComment.append(line).append("\n");
                 }
@@ -36,13 +47,36 @@ public class CommentExtractor {
                 inMultiLineComment = true;
                 multiLineStart = i + 1;
                 multiLineComment = new StringBuilder(line.substring(2));
+                if (line.contains("*/")) {
+                    String commentText = line.substring(2, line.indexOf("*/")).trim();
+                    if (!commentText.isEmpty()) {
+                        comments.add(new Comment(
+                                commentText,
+                                Comment.CommentType.MULTI_LINE,
+                                multiLineStart
+                        ));
+                    }
+                    inMultiLineComment = false;
+                }
+            } else if (line.startsWith("//")) {
+                String commentText = line.substring(2).trim();
+                if (!commentText.isEmpty()) {
+                    comments.add(new Comment(
+                            commentText,
+                            Comment.CommentType.SINGLE_LINE,
+                            i + 1
+                    ));
+                }
             }
+        }
 
-            else if (line.startsWith("//")) {
+        if (inMultiLineComment) {
+            String commentText = multiLineComment.toString().trim();
+            if (!commentText.isEmpty()) {
                 comments.add(new Comment(
-                        line.substring(2),
-                        Comment.CommentType.SINGLE_LINE,
-                        i + 1
+                        commentText,
+                        Comment.CommentType.MULTI_LINE,
+                        multiLineStart
                 ));
             }
         }

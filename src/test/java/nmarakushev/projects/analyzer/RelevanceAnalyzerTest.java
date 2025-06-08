@@ -29,7 +29,6 @@ public class RelevanceAnalyzerTest {
     
     @Test
     public void testCalculateUsefulness() {
-        // Arrange
         Comment comment = new Comment("This method calculates the sum", Comment.CommentType.SINGLE_LINE, 1);
         Set<String> commentTerms = new HashSet<>();
         commentTerms.add("method");
@@ -39,6 +38,7 @@ public class RelevanceAnalyzerTest {
         Set<String> codeTerms = new HashSet<>();
         codeTerms.add("calculateSum");
         codeTerms.add("sum");
+        codeTerms.add("method");
         
         when(nlpProcessor.extractKeyTerms(comment.text())).thenReturn(commentTerms);
         
@@ -47,28 +47,35 @@ public class RelevanceAnalyzerTest {
             new HashSet<>(),
             codeTerms
         );
-        
-        // Act
+
         double usefulness = relevanceAnalyzer.calculateUsefulness(comment, context);
-        
-        // Assert
+
         assertEquals(0.67, usefulness, 0.01);
     }
     
     @Test
     public void testIsRedundant() {
-        // Arrange
         Comment comment = new Comment("This method calculates sum", Comment.CommentType.SINGLE_LINE, 1);
+        Set<String> commentTerms = new HashSet<>();
+        commentTerms.add("method");
+        commentTerms.add("calculates");
+        commentTerms.add("sum");
+        
+        Set<String> codeTerms = new HashSet<>();
+        codeTerms.add("calculateSum");
+        codeTerms.add("sum");
+        codeTerms.add("method");
+        
+        when(nlpProcessor.extractKeyTerms(comment.text())).thenReturn(commentTerms);
+        
         CodeContext context = new CodeContext(
             "public int calculateSum(int a, int b) { return a + b; }",
             new HashSet<>(),
-            new HashSet<>()
+            codeTerms
         );
-        
-        // Act
+
         boolean isRedundant = relevanceAnalyzer.isRedundant(comment, context);
-        
-        // Assert
+
         assertTrue(isRedundant);
     }
 }

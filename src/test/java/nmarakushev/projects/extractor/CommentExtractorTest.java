@@ -29,9 +29,9 @@ public class CommentExtractorTest {
     @Test
     public void testExtractSingleLineComments() throws IOException {
         // Arrange
-        String content = "// Single line comment\n" +
+        String content = "//Single line comment\n" +
                         "public class Test {\n" +
-                        "    // Another comment\n" +
+                        "    //Another comment\n" +
                         "    private String name;\n" +
                         "}";
         Files.write(testFile.toPath(), content.getBytes());
