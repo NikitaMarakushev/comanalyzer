@@ -10,13 +10,53 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class NLPProcessorTest {
+public class NLPProcessorTest {
 
     private NLPProcessor nlpProcessor;
 
     @BeforeEach
-    void setUp() throws IOException {
+    public void setUp() throws IOException {
         nlpProcessor = new NLPProcessor();
+    }
+
+    @Test
+    public void testExtractKeyTerms() {
+        // Arrange
+        String comment = "This method calculates the sum of two numbers";
+        
+        // Act
+        Set<String> terms = nlpProcessor.extractKeyTerms(comment);
+        
+        // Assert
+        assertNotNull(terms);
+        assertTrue(terms.contains("method"));
+        assertTrue(terms.contains("calculates"));
+        assertTrue(terms.contains("sum"));
+        assertTrue(terms.contains("numbers"));
+        assertFalse(terms.contains("this"));
+        assertFalse(terms.contains("the"));
+        assertFalse(terms.contains("of"));
+        assertFalse(terms.contains("two"));
+    }
+    
+    @Test
+    public void testExtractKeyTerms_EmptyInput() {
+        // Act
+        Set<String> terms = nlpProcessor.extractKeyTerms("");
+        
+        // Assert
+        assertNotNull(terms);
+        assertTrue(terms.isEmpty());
+    }
+    
+    @Test
+    public void testExtractKeyTerms_NullInput() {
+        // Act
+        Set<String> terms = nlpProcessor.extractKeyTerms(null);
+        
+        // Assert
+        assertNotNull(terms);
+        assertTrue(terms.isEmpty());
     }
 
     @Nested
@@ -113,25 +153,6 @@ class NLPProcessorTest {
 
             assertFalse(keyTerms.contains("METHOD"));
             assertFalse(keyTerms.contains("Calculate"));
-        }
-
-        @Test
-        @DisplayName("Should handle empty string")
-        void shouldHandleEmptyString() {
-            String comment = "";
-
-            Set<String> keyTerms = nlpProcessor.extractKeyTerms(comment);
-
-            assertNotNull(keyTerms);
-            assertTrue(keyTerms.isEmpty());
-        }
-
-        @Test
-        @DisplayName("Should handle null input gracefully")
-        void shouldHandleNullInput() {
-            assertThrows(NullPointerException.class, () -> {
-                nlpProcessor.extractKeyTerms(null);
-            });
         }
 
         @Test
