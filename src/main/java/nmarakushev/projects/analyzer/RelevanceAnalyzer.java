@@ -4,37 +4,52 @@ import nmarakushev.projects.entity.Comment;
 import nmarakushev.projects.processor.NLPProcessor;
 import nmarakushev.projects.context.CodeContext;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class RelevanceAnalyzer {
     private final NLPProcessor nlpProcessor;
+    private final double redundancyThreshold;
+
     private static final double REDUNDANCY_THRESHOLD = 0.8;
 
     public RelevanceAnalyzer(NLPProcessor nlpProcessor) {
+        this(nlpProcessor, REDUNDANCY_THRESHOLD);
+    }
+
+    public RelevanceAnalyzer(NLPProcessor nlpProcessor, double redundancyThreshold) {
         this.nlpProcessor = nlpProcessor;
+        this.redundancyThreshold = redundancyThreshold;
     }
 
     public double calculateUsefulness(Comment comment, CodeContext codeContext) {
+        if (comment == null || codeContext == null) {
+            return 0.0;
+        }
+
         Set<String> commentTerms = nlpProcessor.extractKeyTerms(comment.text());
-        Set<String> codeTerms = codeContext.variables();
-        codeTerms.addAll(codeContext.methods());
+        if (commentTerms.isEmpty()) {
+            return 0.0;
+        }
 
-        long matches = commentTerms.stream()
-                .filter(codeTerms::contains)
-                .count();
-
-        return (double) matches / Math.max(1, commentTerms.size());
+        Set<String> codeTerms = combineCodeTerms(codeContext);
+        long matches = countTermMatches(commentTerms, codeTerms);
+        return (double) matches / commentTerms.size();
     }
 
     public boolean isRedundant(Comment comment, CodeContext codeContext) {
-        Set<String> commentTerms = nlpProcessor.extractKeyTerms(comment.text());
-        Set<String> codeTerms = codeContext.variables();
-        codeTerms.addAll(codeContext.methods());
+        return calculateUsefulness(comment, codeContext) >= redundancyThreshold;
+    }
 
-        long matches = commentTerms.stream()
+    private Set<String> combineCodeTerms(CodeContext codeContext) {
+        Set<String> combined = new HashSet<>(codeContext.variables());
+        combined.addAll(codeContext.methods());
+        return combined;
+    }
+
+    private long countTermMatches(Set<String> commentTerms, Set<String> codeTerms) {
+        return commentTerms.stream()
                 .filter(codeTerms::contains)
                 .count();
-
-        return (double) matches / Math.max(1, commentTerms.size()) >= REDUNDANCY_THRESHOLD;
     }
 }
