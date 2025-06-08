@@ -11,6 +11,8 @@ import java.util.Set;
 
 public class NLPProcessor {
     private static final String MODEL_PATH = "/models/en-token.bin";
+    private static final String IS_STOP_WORD_REGEX = "a|the|is|are|this|that|and|or|but";
+    private static final String IS_MEANINGFUL_TOKEN_REGEX = "[a-z]+";
 
     private final Tokenizer tokenizer;
 
@@ -36,10 +38,10 @@ public class NLPProcessor {
     }
 
     private boolean isStopWord(String word) {
-        return word.matches("a|the|is|are|this|that|and|or|but");
+        return word.matches(IS_STOP_WORD_REGEX);
     }
 
     private boolean isMeaningfulToken(String word) {
-        return word.length() > 3 && word.matches("[a-z]+");
+        return word.length() > 3 && word.matches(IS_MEANINGFUL_TOKEN_REGEX);
     }
 }
