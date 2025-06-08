@@ -1,8 +1,6 @@
-package nmarakushev.projects;
+package nmarakushev.projects.extractor;
 
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class CommentExtractorTest {
 

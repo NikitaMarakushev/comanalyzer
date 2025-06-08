@@ -1,8 +1,7 @@
-package nmarakushev.projects;
+package nmarakushev.projects.analyzer;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
 public class CodeAnalyzerTest {
 
     @Test

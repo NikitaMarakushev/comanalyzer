@@ -42,3 +42,7 @@ https://www.tutorialspoint.com/opennlp/opennlp_quick_guide.htm
 3) Как натравить инструмент на исходный код
 
 Статус проекта: пока в паузе
+
+
+
+
