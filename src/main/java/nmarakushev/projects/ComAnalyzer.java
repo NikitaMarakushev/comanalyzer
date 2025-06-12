@@ -11,7 +11,7 @@ import nmarakushev.projects.entity.Comment;
 import nmarakushev.projects.extractor.CommentExtractor;
 import nmarakushev.projects.processor.NLPProcessor;
 
-public class Main {
+public class ComAnalyzer {
   private static final double REDUNDANCY_THRESHOLD = 0.7;
 
   public static void main(String[] args) {
@@ -49,7 +49,6 @@ public class Main {
     double usefulness = relevanceAnalyzer.calculateUsefulness(comment, context);
     boolean isRedundant = relevanceAnalyzer.isRedundant(comment, context);
 
-    // Форматированный вывод
     System.out.printf(
         """
             ========================================

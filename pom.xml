@@ -103,7 +103,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>nmarakushev.projects.Main</mainClass>
+                            <mainClass>nmarakushev.projects.ComAnalyzer</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
