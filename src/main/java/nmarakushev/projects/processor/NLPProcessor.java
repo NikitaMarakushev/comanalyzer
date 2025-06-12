@@ -34,7 +34,7 @@ public class NLPProcessor implements AutoCloseable {
   public NLPProcessor(TokenizerModel model, Set<String> codeKeywords) {
     this.tokenizer = new TokenizerME(model);
     this.stemmer = new PorterStemmer();
-    this.codeKeywords = Collections.unmodifiableSet(new HashSet<>(codeKeywords));
+    this.codeKeywords = Set.copyOf(codeKeywords);
   }
 
   public Set<String> extractKeyTerms(String comment) {
